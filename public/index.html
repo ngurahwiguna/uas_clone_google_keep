@@ -1,42 +1,89 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Keep Clone</title>
 
     <link rel="stylesheet" href="css/style.css">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 </head>
 <body>
 
-    <header>
-        <h1>Google Keep Clone</h1>
-    </header>
+<header>
 
-    <main>
+<div class="logo">
+<span class="material-icons">lightbulb</span>
+<h2>Keep</h2>
+</div>
 
-        <section class="note-form">
-            <input type="text" placeholder="Judul Catatan">
-            <textarea placeholder="Tulis catatan..."></textarea>
+<div class="search">
 
-            <button>Tambah Catatan</button>
-        </section>
+<span class="material-icons">search</span>
 
-        <section class="notes">
+<input type="text" placeholder="Search">
 
-            <div class="note">
-                <h3>Belajar JavaScript</h3>
-                <p>Membuat clone Google Keep.</p>
+</div>
 
-                <button>Edit</button>
-                <button>Hapus</button>
-            </div>
+</header>
 
-        </section>
 
-    </main>
+<div class="container">
 
-    <script src="js/script.js"></script>
+<aside>
+
+<ul>
+
+<li class="active">
+<span class="material-icons">lightbulb</span>
+Catatan
+</li>
+
+<li>
+<span class="material-icons">notifications</span>
+Pengingat
+</li>
+
+<li>
+<span class="material-icons">archive</span>
+Arsip
+</li>
+
+<li>
+<span class="material-icons">delete</span>
+Sampah
+</li>
+
+</ul>
+
+</aside>
+
+
+<main>
+
+<div class="add-note">
+
+<input type="text" placeholder="Judul">
+
+<textarea placeholder="Buat catatan..."></textarea>
+
+<button>Tambah Catatan</button>
+
+</div>
+
+
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+<script src="js/script.js"></script>
 
 </body>
 </html>
