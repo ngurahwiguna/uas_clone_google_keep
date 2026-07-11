@@ -85,6 +85,14 @@
 
         <li>
 
+            <span class="material-icons">label</span>
+
+            <span>Label</span>
+
+        </li>
+
+        <li>
+
             <span class="material-icons">archive</span>
 
             <span>Arsip</span>
@@ -124,33 +132,53 @@
 
         <div class="note-footer">
 
-            <select id="color">
+            <div class="note-tools">
 
-                <option value="#ffffff">Putih</option>
+                <button id="checklistBtn" title="Checklist">
+                    <span class="material-icons">check_box</span>
+                </button>
 
-                <option value="#F28B82">Merah</option>
+                <button id="reminderBtn" title="Pengingat">
+                    <span class="material-icons">notifications</span>
+                </button>
 
-                <option value="#FFF475">Kuning</option>
+                <button id="labelBtn" title="Label">
+                    <span class="material-icons">label</span>
+                </button>
 
-                <option value="#CCFF90">Hijau</option>
+                <button id="imageBtn" title="Tambah Gambar">
+                    <span class="material-icons">image</span>
+                </button>
 
-                <option value="#AECBFA">Biru</option>
+                <button id="archiveBtn" title="Arsip">
+                    <span class="material-icons">archive</span>
+                </button>
 
-                <option value="#D7AEFB">Ungu</option>
+                <button id="pinBtn" title="Pin">
+                    <span class="material-icons">push_pin</span>
+                </button>
 
-            </select>
+            </div>
 
-            <button id="addBtn">
+                <div class="note-actions">
 
-                <span class="material-icons">
-                    add
-                </span>
+                    <select id="color">
+                        <option value="#ffffff">Putih</option>
+                        <option value="#FFF475">Kuning</option>
+                        <option value="#CCFF90">Hijau</option>
+                        <option value="#AECBFA">Biru</option>
+                        <option value="#D7AEFB">Ungu</option>
+                    </select>
 
-                Tambah
+                    <button id="addBtn">
+                        <span class="material-icons">add</span>
+                        Tambah
+                    </button>
 
-            </button>
+                </div>
 
-        </div>
+            </div>
+        
 
     </section>
 
@@ -190,28 +218,111 @@
 
         <div class="card-footer">
 
-            <button class="edit-btn">
+            <div class="card-info">
+
+                <span class="note-label"></span>
+
+                <span class="note-reminder"></span>
+
+            </div>
+
+            <button class="menu-btn">
 
                 <span class="material-icons">
-                    edit
-                </span>
-
-            </button>
-
-            <button class="delete-btn">
-
-                <span class="material-icons">
-                    delete
+                    more_vert
                 </span>
 
             </button>
 
         </div>
 
+        <div class="card-menu">
+
+            <button class="edit-btn">Edit</button>
+
+            <button class="duplicate-btn">Buat Salinan</button>
+
+            <button class="checklist-btn">Checklist</button>
+
+            <button class="label-btn">Tambah Label</button>
+
+            <button class="archive-btn">Arsipkan</button>
+
+            <button class="delete-btn">Hapus</button>
+
+        </div>
     </div>
+    <div id="editModal" class="modal">
 
+        <div class="modal-content">
+
+            <h2>Edit Catatan</h2>
+
+            <input
+                type="text"
+                id="editTitle"
+                placeholder="Judul">
+
+            <textarea
+                id="editContent"
+                placeholder="Isi Catatan"></textarea>
+
+            <div class="modal-buttons">
+
+                <button id="cancelEdit">
+
+                    Batal
+
+                </button>
+
+                <button id="saveEdit">
+
+                    Simpan
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+   
 </template>
+    <div id="deleteModal" class="modal">
 
+        <div class="modal-content">
+
+            <h3>
+
+                Hapus catatan?
+
+            </h3>
+
+            <p>
+
+                Catatan akan dipindahkan ke Sampah.
+
+            </p>
+
+            <div class="modal-buttons">
+
+                <button id="cancelDelete">
+
+                    Batal
+
+                </button>
+
+                <button id="confirmDelete">
+
+                    Hapus
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
 <script src="js/script.js"></script>
 
 </body>

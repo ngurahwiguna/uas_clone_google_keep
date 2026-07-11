@@ -1,96 +1,165 @@
-let notes = [];
-
-const title = document.getElementById("title");
-const content = document.getElementById("content");
+// ELEMENT
+const titleInput = document.getElementById("title");
+const contentInput = document.getElementById("content");
+const colorInput = document.getElementById("color");
 const addBtn = document.getElementById("addBtn");
-const notesContainer = document.getElementById("notes");
+const searchInput = document.getElementById("searchInput");
 
-function renderNotes() {
+const notesContainer = document.getElementById("notes");
+const template = document.getElementById("noteTemplate");
+
+// DATA
+let notes = JSON.parse(localStorage.getItem("notes")) || [];
+
+// SAVE
+function saveNotes() {
+    localStorage.setItem("notes", JSON.stringify(notes));
+}
+
+// RENDER
+function renderNotes(keyword = "") {
 
     notesContainer.innerHTML = "";
 
-    notes.forEach((note, index) => {
+    const filtered = notes.filter(note => {
 
-        const card = document.createElement("div");
-        card.className = "card";
+        return (
+            note.title.toLowerCase().includes(keyword.toLowerCase()) ||
+            note.content.toLowerCase().includes(keyword.toLowerCase())
+        );
 
-        card.innerHTML = `
-            <h3>${note.title}</h3>
+    });
 
-            <p>${note.content}</p>
+    filtered.sort((a, b) => b.pinned - a.pinned);
 
-            <div class="actions">
+    filtered.forEach(note => {
 
-                <button onclick="editNote(${index})">
-                    Edit
-                </button>
+        const clone = template.content.cloneNode(true);
 
-                <button onclick="deleteNote(${index})">
-                    Delete
-                </button>
+        clone.querySelector(".card").style.background = note.color;
 
-            </div>
-        `;
+        clone.querySelector(".note-title").textContent = note.title;
 
-        notesContainer.appendChild(card);
+        clone.querySelector(".note-content").textContent = note.content;
+
+        const pinBtn = clone.querySelector(".pin-btn");
+
+        if (note.pinned) {
+
+            pinBtn.style.color = "#fbbc04";
+
+        }
+
+        pinBtn.addEventListener("click", () => {
+
+            note.pinned = !note.pinned;
+
+            saveNotes();
+
+            renderNotes(searchInput.value);
+
+        });
+
+        clone.querySelector(".edit-btn")
+        .addEventListener("click", () => {
+
+            editNote(note.id);
+
+        });
+
+        clone.querySelector(".delete-btn")
+        .addEventListener("click", () => {
+
+            deleteNote(note.id);
+
+        });
+
+        notesContainer.appendChild(clone);
 
     });
 
 }
 
+// ADD
 addBtn.addEventListener("click", () => {
 
-    if(title.value === "" || content.value === ""){
+    if (titleInput.value.trim() === "") {
 
-        alert("Isi judul dan catatan!");
+        alert("Judul tidak boleh kosong");
 
         return;
+
     }
 
     notes.push({
 
-        title:title.value,
+        id: Date.now(),
 
-        content:content.value
+        title: titleInput.value,
+
+        content: contentInput.value,
+
+        color: colorInput.value,
+
+        pinned: false
 
     });
 
-    title.value = "";
+    titleInput.value = "";
 
-    content.value = "";
+    contentInput.value = "";
 
-    renderNotes();
+    colorInput.value = "#ffffff";
+
+    saveNotes();
+
+    renderNotes(searchInput.value);
 
 });
 
-function deleteNote(index){
+// DELETE
+function deleteNote(id) {
 
-    notes.splice(index,1);
+    if (!confirm("Hapus catatan ini?")) return;
 
-    renderNotes();
+    notes = notes.filter(note => note.id !== id);
 
-}
+    saveNotes();
 
-function editNote(index){
-
-    const newTitle = prompt("Edit Judul", notes[index].title);
-
-    const newContent = prompt("Edit Isi", notes[index].content);
-
-    if(newTitle !== null){
-
-        notes[index].title = newTitle;
-
-    }
-
-    if(newContent !== null){
-
-        notes[index].content = newContent;
-
-    }
-
-    renderNotes();
+    renderNotes(searchInput.value);
 
 }
 
+// EDIT
+function editNote(id) {
+
+    const note = notes.find(n => n.id === id);
+
+    if (!note) return;
+
+    const newTitle = prompt("Judul", note.title);
+
+    if (newTitle === null) return;
+
+    const newContent = prompt("Isi Catatan", note.content);
+
+    if (newContent === null) return;
+
+    note.title = newTitle;
+
+    note.content = newContent;
+
+    saveNotes();
+
+    renderNotes(searchInput.value);
+
+}
+
+// SEARCH
+searchInput.addEventListener("keyup", () => {
+
+    renderNotes(searchInput.value);
+
+});
+// START
 renderNotes();

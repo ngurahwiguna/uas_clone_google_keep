@@ -191,11 +191,11 @@ aside li:hover{
 
 main{
 
-    flex:1;
+    width:calc(100% - 240px);
 
     margin-left:240px;
 
-    padding:40px;
+    padding:35px;
 
 }
 
@@ -203,17 +203,19 @@ main{
 
 .add-note{
 
-    width:620px;
+    width:650px;
 
-    margin:auto;
+    max-width:100%;
+
+    margin:0 auto;
 
     background:white;
 
     border-radius:12px;
 
-    box-shadow:0 2px 8px rgba(0,0,0,.15);
+    padding:18px 20px;
 
-    padding:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
 
 }
 
@@ -257,10 +259,67 @@ main{
 
     align-items:center;
 
-    margin-top:15px;
+    margin-top:20px;
+
+    .note-footer{
+
+    border-top:1px solid #eee;
+
+    padding-top:12px;
 
 }
 
+}
+
+.note-tools{
+
+    display:flex;
+
+    gap:10px;
+
+}
+
+.note-actions{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin-left:auto;
+
+}
+
+.note-tools button{
+
+    width:38px;
+
+    height:38px;
+
+    border:none;
+
+    background:transparent;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.note-tools button:hover{
+
+    background:#ececec;
+
+}
 .note-footer select{
 
     padding:8px;
@@ -269,7 +328,20 @@ main{
 
 }
 
-.note-footer button{
+#color{
+
+    height:40px;
+
+    padding:0 10px;
+
+    border:1px solid #ddd;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+#addBtn{
 
     display:flex;
 
@@ -295,21 +367,24 @@ main{
 
 }
 
-.note-footer button:hover{
+#addBtn:hover{
 
     transform:scale(1.05);
 
 }
 
+
 /* ================= NOTES ================= */
 
 .notes{
 
-    margin-top:40px;
+    width:100%;
+
+    margin-top:30px;
 
     display:grid;
 
-    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
 
     gap:20px;
 
@@ -318,6 +393,8 @@ main{
 .card{
 
     background:white;
+
+    position:relative;
 
     border-radius:12px;
 
@@ -329,11 +406,65 @@ main{
 
     transition:.25s;
 
+    width: 100;
+
 }
 
 .card:hover{
 
     transform:translateY(-4px);
+
+}
+
+.card-menu{
+
+    display:none;
+
+    position:absolute;
+
+    top:45px;
+
+    right:15px;
+
+    bottom:50px;
+
+    width:190px;
+
+    background:white;
+
+    border-radius:10px;
+
+    box-shadow:0 5px 18px rgba(0,0,0,.2);
+
+    overflow:hidden;
+
+}
+
+.card-menu button{
+
+    width:100%;
+
+    padding:12px;
+
+    border:none;
+
+    background:white;
+
+    text-align:left;
+
+    cursor:pointer;
+
+}
+
+.card-menu button:hover{
+
+    background:#f5f5f5;
+
+}
+
+.card-menu.show{
+
+    display:block;
 
 }
 
@@ -373,16 +504,15 @@ main{
 
 .card-footer{
 
-    margin-top:25px;
-
     display:flex;
 
-    justify-content:flex-end;
+    justify-content:space-between;
 
-    gap:12px;
+    align-items:center;
+
+    margin-top:20px;
 
 }
-
 .card-footer button{
 
     border:none;
@@ -393,6 +523,93 @@ main{
 
 }
 
+.card-info{
+
+    display:flex;
+
+    gap:8px;
+
+    flex-wrap:wrap;
+
+}
+
+.note-label,
+.note-reminder{
+
+    background:#ececec;
+
+    padding:4px 10px;
+
+    border-radius:20px;
+
+    font-size:12px;
+
+}
+
+.modal{
+
+    display:none;
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.35);
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:999;
+
+}
+
+.modal.show{
+
+    display:flex;
+
+}
+
+.modal-content{
+
+    width:500px;
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:12px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+
+}
+
+.modal-content input,
+.modal-content textarea{
+
+    width:100%;
+
+    padding:12px;
+
+    margin:10px 0;
+
+    border:1px solid #ddd;
+
+    border-radius:8px;
+
+}
+
+.modal-buttons{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:10px;
+
+    margin-top:20px;
+
+}
 /* ================= RESPONSIVE ================= */
 
 @media(max-width:900px){
