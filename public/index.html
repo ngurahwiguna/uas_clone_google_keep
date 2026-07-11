@@ -7,81 +7,210 @@
 
     <link rel="stylesheet" href="css/style.css">
 
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
+    <!-- Google Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
+
+<!-- ================= HEADER ================= -->
 
 <header>
 
-<div class="logo">
-<span class="material-icons">lightbulb</span>
-<h2>Keep</h2>
-</div>
+    <div class="left-header">
 
-<div class="search">
+        <span class="material-icons menu-btn">menu</span>
 
-<span class="material-icons">search</span>
+        <div class="logo">
+            <span class="material-icons logo-icon">lightbulb</span>
+            <h2>Keep</h2>
+        </div>
 
-<input type="text" placeholder="Search">
+    </div>
 
-</div>
+    <div class="search-box">
+
+        <span class="material-icons">search</span>
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Cari catatan..."
+        >
+
+    </div>
+
+    <div class="header-icons">
+
+        <span class="material-icons">refresh</span>
+
+        <span class="material-icons">settings</span>
+
+        <span class="material-icons">apps</span>
+
+        <span class="material-icons">account_circle</span>
+
+    </div>
 
 </header>
 
+<!-- ================= CONTAINER ================= -->
 
 <div class="container">
 
+<!-- ================= SIDEBAR ================= -->
+
 <aside>
 
-<ul>
+    <ul>
 
-<li class="active">
-<span class="material-icons">lightbulb</span>
-Catatan
-</li>
+        <li class="active">
 
-<li>
-<span class="material-icons">notifications</span>
-Pengingat
-</li>
+            <span class="material-icons">lightbulb</span>
 
-<li>
-<span class="material-icons">archive</span>
-Arsip
-</li>
+            <span>Catatan</span>
 
-<li>
-<span class="material-icons">delete</span>
-Sampah
-</li>
+        </li>
 
-</ul>
+        <li>
+
+            <span class="material-icons">notifications</span>
+
+            <span>Pengingat</span>
+
+        </li>
+
+        <li>
+
+            <span class="material-icons">archive</span>
+
+            <span>Arsip</span>
+
+        </li>
+
+        <li>
+
+            <span class="material-icons">delete</span>
+
+            <span>Sampah</span>
+
+        </li>
+
+    </ul>
 
 </aside>
 
+<!-- ================= MAIN ================= -->
 
 <main>
 
-<div class="add-note">
+    <!-- Form Tambah -->
 
-<input type="text" placeholder="Judul">
+    <section class="add-note">
 
-<textarea placeholder="Buat catatan..."></textarea>
+        <input
+            type="text"
+            id="title"
+            placeholder="Judul"
+        >
 
-<button>Tambah Catatan</button>
+        <textarea
+            id="content"
+            placeholder="Tulis catatan..."
+        ></textarea>
 
-</div>
+        <div class="note-footer">
 
+            <select id="color">
 
+                <option value="#ffffff">Putih</option>
 
-</div>
+                <option value="#F28B82">Merah</option>
 
-</div>
+                <option value="#FFF475">Kuning</option>
+
+                <option value="#CCFF90">Hijau</option>
+
+                <option value="#AECBFA">Biru</option>
+
+                <option value="#D7AEFB">Ungu</option>
+
+            </select>
+
+            <button id="addBtn">
+
+                <span class="material-icons">
+                    add
+                </span>
+
+                Tambah
+
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- Notes -->
+
+    <section
+        class="notes"
+        id="notes">
+
+    </section>
 
 </main>
 
 </div>
+
+<!-- ================= TEMPLATE CARD ================= -->
+
+<template id="noteTemplate">
+
+    <div class="card">
+
+        <div class="pin-area">
+
+            <button class="pin-btn">
+
+                <span class="material-icons">
+                    push_pin
+                </span>
+
+            </button>
+
+        </div>
+
+        <h3 class="note-title"></h3>
+
+        <p class="note-content"></p>
+
+        <div class="card-footer">
+
+            <button class="edit-btn">
+
+                <span class="material-icons">
+                    edit
+                </span>
+
+            </button>
+
+            <button class="delete-btn">
+
+                <span class="material-icons">
+                    delete
+                </span>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</template>
 
 <script src="js/script.js"></script>
 
