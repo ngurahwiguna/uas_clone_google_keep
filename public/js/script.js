@@ -1,165 +1,156 @@
-// ELEMENT
-const titleInput = document.getElementById("title");
-const contentInput = document.getElementById("content");
-const colorInput = document.getElementById("color");
-const addBtn = document.getElementById("addBtn");
-const searchInput = document.getElementById("searchInput");
+// 1. STATE DATA (Tempat menyimpan data catatan sementara)
+let notes = [];
+let currentEditId = null;
+let currentDeleteId = null;
 
-const notesContainer = document.getElementById("notes");
-const template = document.getElementById("noteTemplate");
+// 2. AMBIL ELEMEN DOM DARI HTML
+const titleInput = document.getElementById('title');
+const contentInput = document.getElementById('content');
+const colorSelect = document.getElementById('color');
+const addBtn = document.getElementById('addBtn');
+const notesContainer = document.getElementById('notes');
+const noteTemplate = document.getElementById('noteTemplate');
 
-// DATA
-let notes = JSON.parse(localStorage.getItem("notes")) || [];
+// Elemen Modals
+const editModal = document.getElementById('editModal');
+const deleteModal = document.getElementById('deleteModal');
+const editTitleInput = document.getElementById('editTitle');
+const editContentInput = document.getElementById('editContent');
 
-// SAVE
-function saveNotes() {
-    localStorage.setItem("notes", JSON.stringify(notes));
-}
+// Tombol di dalam Modals
+const cancelEditBtn = document.getElementById('cancelEdit');
+const saveEditBtn = document.getElementById('saveEdit');
+const cancelDeleteBtn = document.getElementById('cancelDelete');
+const confirmDeleteBtn = document.getElementById('confirmDelete');
 
-// RENDER
-function renderNotes(keyword = "") {
+// 3. FUNGSI UNTUK MENAMPILKAN CATATAN KE LAYAR (RENDER)
+function renderNotes() {
+    // Kosongkan kontainer terlebih dahulu agar tidak menumpuk saat ada data baru
+    notesContainer.innerHTML = ''; 
 
-    notesContainer.innerHTML = "";
+    notes.forEach(note => {
+        /* 
+           KUNCI UTAMA: Harus menggunakan `.content` sebelum `.cloneNode(true)`.
+           Jika tidak pakai `.content`, elemen akan tetap tersembunyi!
+        */
+        const clone = noteTemplate.content.cloneNode(true);
+        const card = clone.querySelector('.card');
 
-    const filtered = notes.filter(note => {
+        // Isi data catatan ke dalam komponen card hasil klon
+        card.style.backgroundColor = note.color;
+        card.querySelector('.note-title').textContent = note.title || '(Tanpa Judul)';
+        card.querySelector('.note-content').textContent = note.content;
 
-        return (
-            note.title.toLowerCase().includes(keyword.toLowerCase()) ||
-            note.content.toLowerCase().includes(keyword.toLowerCase())
-        );
+        // --- LOGIKA DROPDOWN MENU (TITIK TIGA) ---
+        const menuBtn = card.querySelector('.menu-btn');
+        const cardMenu = card.querySelector('.card-menu');
 
-    });
-
-    filtered.sort((a, b) => b.pinned - a.pinned);
-
-    filtered.forEach(note => {
-
-        const clone = template.content.cloneNode(true);
-
-        clone.querySelector(".card").style.background = note.color;
-
-        clone.querySelector(".note-title").textContent = note.title;
-
-        clone.querySelector(".note-content").textContent = note.content;
-
-        const pinBtn = clone.querySelector(".pin-btn");
-
-        if (note.pinned) {
-
-            pinBtn.style.color = "#fbbc04";
-
-        }
-
-        pinBtn.addEventListener("click", () => {
-
-            note.pinned = !note.pinned;
-
-            saveNotes();
-
-            renderNotes(searchInput.value);
-
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Mencegah click event tembus ke body
+            
+            // Tutup semua dropdown lain yang mungkin sedang terbuka
+            document.querySelectorAll('.card-menu.show').forEach(menu => {
+                if (menu !== cardMenu) menu.classList.remove('show');
+            });
+            
+            // Toggle menu aktif
+            cardMenu.classList.toggle('show');
         });
 
-        clone.querySelector(".edit-btn")
-        .addEventListener("click", () => {
-
-            editNote(note.id);
-
+        // --- LOGIKA TOMBOL EDIT DI DALAM CARD ---
+        const editBtn = card.querySelector('.edit-btn');
+        editBtn.addEventListener('click', () => {
+            currentEditId = note.id;
+            editTitleInput.value = note.title;
+            editContentInput.value = note.content;
+            editModal.classList.add('show'); // Tampilkan modal edit
+            cardMenu.classList.remove('show'); // Tutup dropdown
         });
 
-        clone.querySelector(".delete-btn")
-        .addEventListener("click", () => {
-
-            deleteNote(note.id);
-
+        // --- LOGIKA TOMBOL HAPUS DI DALAM CARD ---
+        const deleteBtn = card.querySelector('.delete-btn');
+        deleteBtn.addEventListener('click', () => {
+            currentDeleteId = note.id;
+            deleteModal.classList.add('show'); // Tampilkan modal konfirmasi hapus
+            cardMenu.classList.remove('show'); // Tutup dropdown
         });
 
+        // --- LOGIKA TOMBOL DUPLICATE (BUAT SALINAN) ---
+        const duplicateBtn = card.querySelector('.duplicate-btn');
+        duplicateBtn.addEventListener('click', () => {
+            const duplicatedNote = {
+                id: Date.now(),
+                title: note.title + " (Salinan)",
+                content: note.content,
+                color: note.color
+            };
+            notes.push(duplicatedNote);
+            renderNotes();
+        });
+
+        // Masukkan elemen card yang sudah jadi ke dalam section #notes
         notesContainer.appendChild(clone);
-
     });
-
 }
 
-// ADD
-addBtn.addEventListener("click", () => {
+// 4. EVENT LISTENERS
 
-    if (titleInput.value.trim() === "") {
+// Aksi Tambah Catatan Baru
+addBtn.addEventListener('click', () => {
+    const title = titleInput.value.trim();
+    const content = contentInput.value.trim();
+    const color = colorSelect.value;
 
-        alert("Judul tidak boleh kosong");
-
+    // Validasi: Catatan tidak boleh benar-benar kosong
+    if (!title && !content) {
+        alert('Tulis sesuatu terlebih dahulu sebelum menambahkan catatan!');
         return;
-
     }
 
-    notes.push({
+    // Buat objek data baru
+    const newNote = {
+        id: Date.now(), // Membuat ID unik berbasis waktu saat ini
+        title: title,
+        content: content,
+        color: color
+    };
 
-        id: Date.now(),
+    // Masukkan ke array utama
+    notes.push(newNote);
 
-        title: titleInput.value,
+    // Reset Form Input ke kondisi awal
+    titleInput.value = '';
+    contentInput.value = '';
+    colorSelect.value = '#ffffff';
 
-        content: contentInput.value,
+    // Cetak ulang semua catatan agar data baru muncul
+    renderNotes();
+});
 
-        color: colorInput.value,
-
-        pinned: false
-
+// Tutup menu dropdown jika pengguna mengklik area mana saja di luar menu
+document.addEventListener('click', () => {
+    document.querySelectorAll('.card-menu.show').forEach(menu => {
+        menu.classList.remove('show');
     });
-
-    titleInput.value = "";
-
-    contentInput.value = "";
-
-    colorInput.value = "#ffffff";
-
-    saveNotes();
-
-    renderNotes(searchInput.value);
-
 });
 
-// DELETE
-function deleteNote(id) {
-
-    if (!confirm("Hapus catatan ini?")) return;
-
-    notes = notes.filter(note => note.id !== id);
-
-    saveNotes();
-
-    renderNotes(searchInput.value);
-
-}
-
-// EDIT
-function editNote(id) {
-
-    const note = notes.find(n => n.id === id);
-
-    if (!note) return;
-
-    const newTitle = prompt("Judul", note.title);
-
-    if (newTitle === null) return;
-
-    const newContent = prompt("Isi Catatan", note.content);
-
-    if (newContent === null) return;
-
-    note.title = newTitle;
-
-    note.content = newContent;
-
-    saveNotes();
-
-    renderNotes(searchInput.value);
-
-}
-
-// SEARCH
-searchInput.addEventListener("keyup", () => {
-
-    renderNotes(searchInput.value);
-
+// --- AKSI PADA MODAL EDIT ---
+cancelEditBtn.addEventListener('click', () => editModal.classList.remove('show'));
+saveEditBtn.addEventListener('click', () => {
+    const note = notes.find(n => n.id === currentEditId);
+    if (note) {
+        note.title = editTitleInput.value.trim();
+        note.content = editContentInput.value.trim();
+        editModal.classList.remove('show');
+        renderNotes();
+    }
 });
-// START
-renderNotes();
+
+// --- AKSI PADA MODAL DELETE ---
+cancelDeleteBtn.addEventListener('click', () => deleteModal.classList.remove('show'));
+confirmDeleteBtn.addEventListener('click', () => {
+    // Filter array untuk membuang catatan dengan ID yang dipilih
+    notes = notes.filter(n => n.id !== currentDeleteId);
+    deleteModal.classList.remove('show');
+    renderNotes();
+});

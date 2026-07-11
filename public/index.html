@@ -17,151 +17,87 @@
 <body>
 
 <!-- ================= HEADER ================= -->
-
 <header>
-
     <div class="left-header">
-
         <span class="material-icons menu-btn">menu</span>
-
         <div class="logo">
             <span class="material-icons logo-icon">lightbulb</span>
             <h2>Keep</h2>
         </div>
-
     </div>
 
     <div class="search-box">
-
         <span class="material-icons">search</span>
-
-        <input
-            type="text"
-            id="searchInput"
-            placeholder="Cari catatan..."
-        >
-
+        <input type="text" id="searchInput" placeholder="Cari catatan...">
     </div>
 
     <div class="header-icons">
-
         <span class="material-icons">refresh</span>
-
         <span class="material-icons">settings</span>
-
         <span class="material-icons">apps</span>
-
         <span class="material-icons">account_circle</span>
-
     </div>
-
 </header>
 
 <!-- ================= CONTAINER ================= -->
-
 <div class="container">
 
-<!-- ================= SIDEBAR ================= -->
+    <!-- ================= SIDEBAR ================= -->
+    <aside>
+        <ul>
+            <li class="active">
+                <span class="material-icons">lightbulb</span>
+                <span>Catatan</span>
+            </li>
+            <li>
+                <span class="material-icons">notifications</span>
+                <span>Pengingat</span>
+            </li>
+            <li>
+                <span class="material-icons">label</span>
+                <span>Label</span>
+            </li>
+            <li>
+                <span class="material-icons">archive</span>
+                <span>Arsip</span>
+            </li>
+            <li>
+                <span class="material-icons">delete</span>
+                <span>Sampah</span>
+            </li>
+        </ul>
+    </aside>
 
-<aside>
+    <!-- ================= MAIN ================= -->
+    <main>
+        <!-- Form Tambah -->
+        <section class="add-note">
+            <input type="text" id="title" placeholder="Judul">
+            <textarea id="content" placeholder="Tulis catatan..."></textarea>
 
-    <ul>
-
-        <li class="active">
-
-            <span class="material-icons">lightbulb</span>
-
-            <span>Catatan</span>
-
-        </li>
-
-        <li>
-
-            <span class="material-icons">notifications</span>
-
-            <span>Pengingat</span>
-
-        </li>
-
-        <li>
-
-            <span class="material-icons">label</span>
-
-            <span>Label</span>
-
-        </li>
-
-        <li>
-
-            <span class="material-icons">archive</span>
-
-            <span>Arsip</span>
-
-        </li>
-
-        <li>
-
-            <span class="material-icons">delete</span>
-
-            <span>Sampah</span>
-
-        </li>
-
-    </ul>
-
-</aside>
-
-<!-- ================= MAIN ================= -->
-
-<main>
-
-    <!-- Form Tambah -->
-
-    <section class="add-note">
-
-        <input
-            type="text"
-            id="title"
-            placeholder="Judul"
-        >
-
-        <textarea
-            id="content"
-            placeholder="Tulis catatan..."
-        ></textarea>
-
-        <div class="note-footer">
-
-            <div class="note-tools">
-
-                <button id="checklistBtn" title="Checklist">
-                    <span class="material-icons">check_box</span>
-                </button>
-
-                <button id="reminderBtn" title="Pengingat">
-                    <span class="material-icons">notifications</span>
-                </button>
-
-                <button id="labelBtn" title="Label">
-                    <span class="material-icons">label</span>
-                </button>
-
-                <button id="imageBtn" title="Tambah Gambar">
-                    <span class="material-icons">image</span>
-                </button>
-
-                <button id="archiveBtn" title="Arsip">
-                    <span class="material-icons">archive</span>
-                </button>
-
-                <button id="pinBtn" title="Pin">
-                    <span class="material-icons">push_pin</span>
-                </button>
-
-            </div>
+            <div class="note-footer">
+                <div class="note-tools">
+                    <button id="checklistBtn" title="Checklist">
+                        <span class="material-icons">check_box</span>
+                    </button>
+                    <button id="reminderBtn" title="Pengingat">
+                        <span class="material-icons">notifications</span>
+                    </button>
+                    <button id="labelBtn" title="Label">
+                        <span class="material-icons">label</span>
+                    </button>
+                    <button id="imageBtn" title="Tambah Gambar">
+                        <span class="material-icons">image</span>
+                    </button>
+                    <button id="archiveBtn" title="Arsip">
+                        <span class="material-icons">archive</span>
+                    </button>
+                    <button id="pinBtn" title="Pin">
+                        <span class="material-icons">push_pin</span>
+                    </button>
+                </div>
 
                 <div class="note-actions">
-
                     <select id="color">
                         <option value="#ffffff">Putih</option>
                         <option value="#FFF475">Kuning</option>
@@ -174,155 +110,75 @@
                         <span class="material-icons">add</span>
                         Tambah
                     </button>
-
                 </div>
-
             </div>
-        
+        </section>
 
-    </section>
-
-    <!-- Notes -->
-
-    <section
-        class="notes"
-        id="notes">
-
-    </section>
-
-</main>
+        <!-- Notes Container -->
+        <section class="notes" id="notes"></section>
+    </main>
 
 </div>
 
 <!-- ================= TEMPLATE CARD ================= -->
-
 <template id="noteTemplate">
-
     <div class="card">
-
         <div class="pin-area">
-
             <button class="pin-btn">
-
-                <span class="material-icons">
-                    push_pin
-                </span>
-
+                <span class="material-icons">push_pin</span>
             </button>
-
         </div>
 
         <h3 class="note-title"></h3>
-
         <p class="note-content"></p>
 
         <div class="card-footer">
-
             <div class="card-info">
-
                 <span class="note-label"></span>
-
                 <span class="note-reminder"></span>
-
             </div>
 
             <button class="menu-btn">
-
-                <span class="material-icons">
-                    more_vert
-                </span>
-
+                <span class="material-icons">more_vert</span>
             </button>
-
         </div>
 
         <div class="card-menu">
-
             <button class="edit-btn">Edit</button>
-
             <button class="duplicate-btn">Buat Salinan</button>
-
             <button class="checklist-btn">Checklist</button>
-
             <button class="label-btn">Tambah Label</button>
-
             <button class="archive-btn">Arsipkan</button>
-
             <button class="delete-btn">Hapus</button>
-
         </div>
     </div>
-    <div id="editModal" class="modal">
-
-        <div class="modal-content">
-
-            <h2>Edit Catatan</h2>
-
-            <input
-                type="text"
-                id="editTitle"
-                placeholder="Judul">
-
-            <textarea
-                id="editContent"
-                placeholder="Isi Catatan"></textarea>
-
-            <div class="modal-buttons">
-
-                <button id="cancelEdit">
-
-                    Batal
-
-                </button>
-
-                <button id="saveEdit">
-
-                    Simpan
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-   
 </template>
-    <div id="deleteModal" class="modal">
 
-        <div class="modal-content">
-
-            <h3>
-
-                Hapus catatan?
-
-            </h3>
-
-            <p>
-
-                Catatan akan dipindahkan ke Sampah.
-
-            </p>
-
-            <div class="modal-buttons">
-
-                <button id="cancelDelete">
-
-                    Batal
-
-                </button>
-
-                <button id="confirmDelete">
-
-                    Hapus
-
-                </button>
-
-            </div>
-
+<!-- ================= MODAL EDIT & DELETE (DI LUAR TEMPLATE) ================= -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h2>Edit Catatan</h2>
+        <input type="text" id="editTitle" placeholder="Judul">
+        <textarea id="editContent" placeholder="Isi Catatan"></textarea>
+        <div class="modal-buttons">
+            <button id="cancelEdit">Batal</button>
+            <button id="saveEdit">Simpan</button>
         </div>
-
     </div>
+</div>
+
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <h3>Hapus catatan?</h3>
+        <p>Catatan akan dipindahkan ke Sampah.</p>
+        <div class="modal-buttons">
+            <button id="cancelDelete">Batal</button>
+            <button id="confirmDelete">Hapus</button>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript Load -->
 <script src="js/script.js"></script>
 
 </body>
