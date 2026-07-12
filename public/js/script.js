@@ -8,6 +8,7 @@ let formIsChecklist = false;
 let formLabel = '';
 let formIsArchived = false;
 let formReminderDate = ''; 
+let searchKeyword = ''; // <-- 1. Variabel penampung kata kunci pencarian
 
 const titleInput = document.getElementById('title');
 const contentInput = document.getElementById('content');
@@ -244,6 +245,15 @@ function renderNotes() {
         if (currentView === 'reminders') return note.reminderDate && !note.isTrashed;
         return true;
     });
+
+    // 2. LOGIKA SEARCH: Menyaring data sebelum dirender ke layar
+    if (searchKeyword) {
+        filteredNotes = filteredNotes.filter(note => {
+            const title = note.title ? note.title.toLowerCase() : '';
+            const content = note.content ? note.content.toLowerCase() : '';
+            return title.includes(searchKeyword) || content.includes(searchKeyword);
+        });
+    }
 
     filteredNotes.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
 
@@ -507,10 +517,8 @@ confirmDeleteBtn.addEventListener('click', async () => {
     if (note) {
         try {
             if (note.isTrashed) {
-        
                 await fetch(`/api/notes/${currentDeleteId}`, { method: 'DELETE' });
             } else {
-             
                 await fetch(`/api/notes/${currentDeleteId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -536,7 +544,6 @@ setInterval(() => {
         if (note.reminderDate === hariIniString && !note.isTrashed) {
             alert(` PENGINGAT HARI INI:\n\nCatatan: "${note.title || 'Tanpa Judul'}"\nIsi: ${note.content}`);
             note.reminderDate = ''; 
-            // Update status ke server agar alarm tidak terpicu lagi
             fetch(`/api/notes/${note.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -551,23 +558,12 @@ document.addEventListener('DOMContentLoaded', () => {
     loadNotes();
 });
 
+// 3. FITUR SEARCH BARU: Menyuplai nilai keyword ke sistem filter utama
 const searchInput = document.getElementById('searchInput');
 
 if (searchInput) {
     searchInput.addEventListener('input', (e) => {
-        const keyword = e.target.value.toLowerCase().trim(); 
-        const noteCards = document.querySelectorAll('#notes .card'); 
-
-        noteCards.forEach(card => {
-            // Ambil teks judul dan isi dari dalam masing-masing kartu
-            const title = card.querySelector('.note-title')?.textContent.toLowerCase() || '';
-            const content = card.querySelector('.note-content')?.textContent.toLowerCase() || '';
-
-            if (title.includes(keyword) || content.includes(keyword)) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none'; 
-            }
-        });
+        searchKeyword = e.target.value.toLowerCase().trim(); 
+        renderNotes(); // Menggambar ulang catatan secara rapi berdasarkan keyword saat ini
     });
 }

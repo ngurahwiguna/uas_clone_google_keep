@@ -10,6 +10,7 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
+// 1. Mengambil semua catatan dari MySQL
 const readAll = async () => {
     const [rows] = await pool.query('SELECT * FROM notes');
 
@@ -22,6 +23,50 @@ const readAll = async () => {
     }));
 };
 
+// 2. Menambah catatan baru dengan auto-fallback ID jika frontend tidak mengirimkannya
+const create = async (note) => {
+    const finalId = note.id || Date.now(); 
+    const { title, content, color, isPinned, isChecklist, label, isArchived, reminderDate, isTrashed } = note;
+    
+    await pool.query(
+        'INSERT INTO notes (id, title, content, color, isPinned, isChecklist, label, isArchived, reminderDate, isTrashed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [
+            finalId, title, content, color, 
+            isPinned ? 1 : 0, isChecklist ? 1 : 0, 
+            label, isArchived ? 1 : 0, reminderDate, isTrashed ? 1 : 0
+        ]
+    );
+    return { ...note, id: finalId };
+};
+
+// 3. Mengubah catatan berdasarkan data yang dikirim frontend
+const update = async (id, updatedFields) => {
+    const fields = [];
+    const values = [];
+
+    for (const [key, value] of Object.entries(updatedFields)) {
+        fields.push(`${key} = ?`);
+        if (typeof value === 'boolean') {
+            values.push(value ? 1 : 0);
+        } else {
+            values.push(value);
+        }
+    }
+
+    if (fields.length === 0) return;
+
+    values.push(id);
+    await pool.query(`UPDATE notes SET ${fields.join(', ')} WHERE id = ?`, values);
+    return { id, ...updatedFields };
+};
+
+// 4. Menghapus catatan berdasarkan ID
+const deleteNote = async (id) => {
+    await pool.query('DELETE FROM notes WHERE id = ?', [id]);
+    return { id };
+};
+
+// 5. Fungsi writeAll (cadangan / jika dipanggil di tempat lain)
 const writeAll = async (notes) => {
     await pool.query('TRUNCATE TABLE notes');
     if (notes.length === 0) return;
@@ -38,4 +83,11 @@ const writeAll = async (notes) => {
     );
 };
 
-module.exports = { readAll, writeAll };
+// Pastikan semua nama ekspor ini singkron dengan service
+module.exports = { 
+    readAll, 
+    writeAll, 
+    create, 
+    update, 
+    delete: deleteNote 
+};
