@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.33% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>25/30</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/4</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">88% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>22/25</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
@@ -88,94 +88,64 @@
 <a name='L23'></a><a href='#L23'>23</a>
 <a name='L24'></a><a href='#L24'>24</a>
 <a name='L25'></a><a href='#L25'>25</a>
-<a name='L26'></a><a href='#L26'>26</a>
-<a name='L27'></a><a href='#L27'>27</a>
-<a name='L28'></a><a href='#L28'>28</a>
-<a name='L29'></a><a href='#L29'>29</a>
-<a name='L30'></a><a href='#L30'>30</a>
-<a name='L31'></a><a href='#L31'>31</a>
-<a name='L32'></a><a href='#L32'>32</a>
-<a name='L33'></a><a href='#L33'>33</a>
-<a name='L34'></a><a href='#L34'>34</a>
-<a name='L35'></a><a href='#L35'>35</a>
-<a name='L36'></a><a href='#L36'>36</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L26'></a><a href='#L26'>26</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">const noteRepository = require('../repositories/noteRepositories'); 
-const Note = require('../models/note'); 
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span></td><td class="text"><pre class="prettyprint lang-js">const noteRepository = require('../repositories/noteRepositories');
 &nbsp;
-const getAllNotes = async () =&gt; {
-    return await noteRepository.readAll();
+const noteService = {
+    // 1. Mengambil semua catatan dari MySQL
+    getAllNotes: async () =&gt; {
+        return await noteRepository.readAll();
+    },
+&nbsp;
+    // 2. Menambah catatan baru langsung ke MySQL
+    createNote: async (noteData) =&gt; {
+        // Kita langsung lempar payload data dari frontend ke repositori database
+        return await noteRepository.create(noteData);
+    },
+&nbsp;
+    // 3. Mengubah catatan berdasarkan ID di MySQL
+    updateNote: async (id, updatedFields) =&gt; {
+        return await noteRepository.update(id, updatedFields);
+    },
+&nbsp;
+    // 4. Menghapus catatan berdasarkan ID di MySQL
+    deleteNote: async (id) =&gt; {
+        return await noteRepository.delete(id);
+    }
 };
 &nbsp;
-const createNote = async (noteData) =&gt; {
-    const notes = await noteRepository.readAll();
-    const newNote = new Note(noteData);
-    notes.push(newNote);
-    await noteRepository.writeAll(notes);
-<span class="cstat-no" title="statement not covered" >    return newNote;</span>
-};
-&nbsp;
-const updateNote = async (id, updatedFields) =&gt; {
-    const notes = await noteRepository.readAll();
-    const index = notes.findIndex(n =&gt; n.id === id);
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (index === -1) <span class="cstat-no" title="statement not covered" >return null;</span>
-&nbsp;
-    notes[index] = { ...notes[index], ...updatedFields };
-    await noteRepository.writeAll(notes);
-<span class="cstat-no" title="statement not covered" >    return notes[index];</span>
-};
-&nbsp;
-const deleteNote = async (id) =&gt; {
-    let notes = await noteRepository.readAll();
-    const exists = notes.some(n =&gt; n.id === id);
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (!exists) <span class="cstat-no" title="statement not covered" >return false;</span>
-&nbsp;
-    notes = notes.filter(n =&gt; n.id !== id);
-    await noteRepository.writeAll(notes);
-<span class="cstat-no" title="statement not covered" >    return true;</span>
-};
-&nbsp;
-module.exports = { getAllNotes, createNote, updateNote, deleteNote };</pre></td></tr></table></pre>
+module.exports = noteService;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-12T07:31:56.467Z
+                at 2026-07-12T13:19:43.013Z
             </div>
         <script src="../prettify.js"></script>
         <script>

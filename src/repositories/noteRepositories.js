@@ -66,7 +66,22 @@ const deleteNote = async (id) => {
     return { id };
 };
 
-// 5. Fungsi writeAll (cadangan / jika dipanggil di tempat lain)
+// 5. Fungsi Pencarian Catatan
+const searchNotes = async (keyword) => {
+    const [rows] = await pool.query(
+        'SELECT * FROM notes WHERE (title LIKE ? OR content LIKE ?) AND isTrashed = 0',
+        [`%${keyword}%`, `%${keyword}%`]
+    );
+    return rows.map(row => ({
+        ...row,
+        isPinned: !!row.isPinned,
+        isChecklist: !!row.isChecklist,
+        isArchived: !!row.isArchived,
+        isTrashed: !!row.isTrashed
+    }));
+};
+
+// 6. Fungsi writeAll (cadangan)
 const writeAll = async (notes) => {
     await pool.query('TRUNCATE TABLE notes');
     if (notes.length === 0) return;
@@ -83,11 +98,11 @@ const writeAll = async (notes) => {
     );
 };
 
-// Pastikan semua nama ekspor ini singkron dengan service
 module.exports = { 
     readAll, 
     writeAll, 
     create, 
     update, 
-    delete: deleteNote 
+    delete: deleteNote,
+    searchNotes
 };

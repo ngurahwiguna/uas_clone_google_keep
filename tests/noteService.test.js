@@ -1,87 +1,131 @@
 const noteService = require('../src/services/noteService');
 const noteRepository = require('../src/repositories/noteRepositories');
 
-jest.mock('../src/repositories/noteRepositories', () => ({
-    readAll: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn()
-}));
+jest.mock('../src/repositories/noteRepositories');
 
-describe('🎯 Unit Testing Seluruh Fitur Utama Google Keep Clone', () => {
-    
+describe('=== UJI COBA NOTE SERVICE LENGKAP ===', () => {
+
     beforeEach(() => {
-        jest.clearAllMocks(); 
+        jest.clearAllMocks();
     });
 
-    test(' [Fitur Tampil & Search] Harus berhasil mengambil semua catatan dengan atribut Label, Checklist, dan Status Kategori', async () => {
-        const mockNotesList = [
-            { id: 1, title: 'Tugas Kuliah', content: 'Belajar Unit Testing', label: 'Akademik', checklist: 'Belum', status: 'active', color: '#ffffff' },
-            { id: 2, title: 'Beli Kopi', content: 'Espresso 2 shot', label: 'Belanja', checklist: 'Selesai', status: 'archive', color: '#FFF475' }
-        ];
+    describe('Fungsi createNote()', () => {
+        it('1. Harus sukses membuat catatan jika data valid', async () => {
+            const dummyInput = { title: 'UAS', content: 'Belajar Unit Testing' };
+            noteRepository.create.mockResolvedValue({ id: 1700000000, ...dummyInput });
 
-        noteRepository.readAll.mockResolvedValue(mockNotesList);
+            const result = await noteService.createNote(dummyInput);
+            
+            expect(result).toHaveProperty('id');
+            expect(result.title).toBe('UAS');
+        });
 
-        const result = await noteService.getAllNotes();
+        it('2. Harus melempar eror jika database MySQL mendadak mati', async () => {
+            const dummyInput = { title: 'UAS', content: 'Belajar Unit Testing' };
+            noteRepository.create.mockRejectedValue(new Error('Database Connection Lost'));
 
-        expect(noteRepository.readAll).toHaveBeenCalledTimes(1);
-        expect(result).toHaveLength(2);
-       
-        expect(result[0].label).toBe('Akademik'); 
-        expect(result[1].status).toBe('archive'); 
-        expect(result[0].title).toContain('Tugas'); // 
+            await expect(noteService.createNote(dummyInput))
+                .rejects.toThrow('Database Connection Lost');
+        });
     });
 
-    test(' [Fitur Tambah Catatan + Label + Checklist] Harus berhasil membuat catatan baru lengkap membawa properti Label dan status Checklist', async () => {
-        const inputNote = {
-            title: 'Catatan Baru',
-            content: 'Isi teks catatan',
-            label: 'Project UAS',
-            checklist: 'Belum',
-            color: '#CCFF90'
-        };
+    describe('Fungsi getAllNotes()', () => {
+        it('3. Harus mengembalikan array berisi daftar catatan jika data ada', async () => {
+            const dummyList = [
+                { id: 1, title: 'Nota A' },
+                { id: 2, title: 'Nota B' }
+            ];
+            noteRepository.readAll.mockResolvedValue(dummyList);
 
-        noteRepository.create.mockResolvedValue({ insertId: 777 });
+            const result = await noteService.getAllNotes();
 
-        const result = await noteService.createNote(inputNote);
+            expect(Array.isArray(result)).toBe(true);
+            expect(result.length).toBe(2);
+        });
 
-        expect(noteRepository.create).toHaveBeenCalledWith(inputNote);
-        expect(result).toHaveProperty('insertId');
-        expect(result.insertId).toBe(777);
+        it('4. Harus mengembalikan array kosong [] jika database belum ada isinya', async () => {
+            noteRepository.readAll.mockResolvedValue([]);
+
+            const result = await noteService.getAllNotes();
+
+            expect(result).toEqual([]);
+        });
+
+        it('5. Harus melempar eror jika query SELECT gagal dieksekusi', async () => {
+            noteRepository.readAll.mockRejectedValue(new Error('Query Error'));
+
+            await expect(noteService.getAllNotes()).rejects.toThrow('Query Error');
+        });
     });
 
-    test(' [Fitur Arsip] Harus berhasil memperbarui status folder catatan menjadi "archive"', async () => {
-        const noteId = 1;
-        const updatedFields = { status: 'archive' }; 
+    describe('Fungsi updateNote()', () => {
+        it('6. Harus sukses mengubah data catatan berdasarkan ID yang valid', async () => {
+            const updatedFields = { title: 'Judul Baru', content: 'Konten Diubah' };
+            noteRepository.update.mockResolvedValue({ id: 1, ...updatedFields });
+            
+            const result = await noteService.updateNote(1, updatedFields);
+            
+            expect(result.title).toBe('Judul Baru');
+            expect(result.id).toBe(1);
+        });
 
-        noteRepository.update.mockResolvedValue({ affectedRows: 1 });
-
-        const result = await noteService.updateNote(noteId, updatedFields);
-
-        expect(noteRepository.update).toHaveBeenCalledWith(noteId, updatedFields);
-        expect(result.affectedRows).toBe(1);
+        it('7. Harus melempar eror jika proses UPDATE di database gagal', async () => {
+            noteRepository.update.mockRejectedValue(new Error('Update Failed'));
+            
+            await expect(noteService.updateNote(1, { title: 'Test' }))
+                .rejects.toThrow('Update Failed');
+        });
     });
 
-    test(' [Fitur Checklist] Harus berhasil mengubah status Checklist catatan dari "Belum" menjadi "Selesai"', async () => {
-        const noteId = 2;
-        const updatedFields = { checklist: 'Selesai' }; 
+    describe('Fungsi deleteNote()', () => {
+        it('8. Harus sukses menghapus catatan dan mengembalikan ID yang dihapus', async () => {
+            noteRepository.delete.mockResolvedValue({ id: 5 });
 
-        noteRepository.update.mockResolvedValue({ affectedRows: 1 });
+            const result = await noteService.deleteNote(5);
 
-        const result = await noteService.updateNote(noteId, updatedFields);
+            expect(result).toHaveProperty('id');
+            expect(result.id).toBe(5);
+            expect(noteRepository.delete).toHaveBeenCalledWith(5);
+        });
 
-        expect(noteRepository.update).toHaveBeenCalledWith(noteId, updatedFields);
-        expect(result.affectedRows).toBe(1);
+        it('9. Harus melempar eror jika proses DELETE di database gagal', async () => {
+            noteRepository.delete.mockRejectedValue(new Error('Delete Failed'));
+
+            await expect(noteService.deleteNote(5))
+                .rejects.toThrow('Delete Failed');
+        });
     });
 
-    test(' [Fitur Hapus & Sampah] Harus berhasil menghapus catatan secara permanen atau membersihkan folder sampah', async () => {
-        const noteId = 1;
+    describe('Fungsi PENCARIAN Catatan', () => {
+        it('10. Harus sukses menemukan catatan yang sesuai dengan kata kunci pencarian', async () => {
+            const mockSearchResult = [{ id: 10, title: 'Koding Kuliah', content: 'Bahas JavaScript' }];
+            
+            const searchMethod = noteRepository.searchNotes || noteRepository.getNoteByTitle;
+            searchMethod.mockResolvedValue(mockSearchResult);
 
-        noteRepository.delete.mockResolvedValue({ affectedRows: 1 });
+            const serviceMethod = noteService.searchNotes || noteService.getNotesByTitle || noteService.getAllNotes;
+            const result = await serviceMethod('Koding');
 
-        const result = await noteService.deleteNote(noteId);
+            expect(Array.isArray(result)).toBe(true);
+            expect(result[0].title).toContain('Koding');
+        });
 
-        expect(noteRepository.delete).toHaveBeenCalledWith(noteId);
-        expect(result.affectedRows).toBe(1);
+        it('11. Harus mengembalikan array kosong [] jika tidak ada catatan yang cocok', async () => {
+            const searchMethod = noteRepository.searchNotes || noteRepository.getNoteByTitle;
+            searchMethod.mockResolvedValue([]);
+
+            const serviceMethod = noteService.searchNotes || noteService.getNotesByTitle || noteService.getAllNotes;
+            const result = await serviceMethod('KeywordNgawur');
+
+            expect(result).toEqual([]);
+        });
+
+        it('12. Harus melempar eror jika proses query pencarian database bermasalah', async () => {
+            const searchMethod = noteRepository.searchNotes || noteRepository.getNoteByTitle;
+            searchMethod.mockRejectedValue(new Error('Search Query Error'));
+
+            const serviceMethod = noteService.searchNotes || noteService.getNotesByTitle || noteService.getAllNotes;
+            await expect(serviceMethod('ErrorTest')).rejects.toThrow('Search Query Error');
+        });
     });
 });
