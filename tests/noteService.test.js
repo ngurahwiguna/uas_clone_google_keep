@@ -1,131 +1,161 @@
 const noteService = require('../src/services/noteService');
 const noteRepository = require('../src/repositories/noteRepositories');
 
+// Mock Repository
 jest.mock('../src/repositories/noteRepositories');
 
-describe('=== UJI COBA NOTE SERVICE LENGKAP ===', () => {
+describe('UJI COBA NOTE SERVICE LENGKAP ', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
     describe('Fungsi createNote()', () => {
-        it('1. Harus sukses membuat catatan jika data valid', async () => {
-            const dummyInput = { title: 'UAS', content: 'Belajar Unit Testing' };
-            noteRepository.create.mockResolvedValue({ id: 1700000000, ...dummyInput });
-
-            const result = await noteService.createNote(dummyInput);
-            
-            expect(result).toHaveProperty('id');
-            expect(result.title).toBe('UAS');
+        it('1. Sukses buat catatan dengan data lengkap', async () => {
+            const data = { title: 'T', content: 'C', isPinned: true };
+            noteRepository.create.mockResolvedValue({ id: 1, ...data });
+            await noteService.createNote(data);
+            expect(noteRepository.create).toHaveBeenCalledWith(data);
         });
 
-        it('2. Harus melempar eror jika database MySQL mendadak mati', async () => {
-            const dummyInput = { title: 'UAS', content: 'Belajar Unit Testing' };
-            noteRepository.create.mockRejectedValue(new Error('Database Connection Lost'));
+        it('2. Sukses buat catatan dengan status arsip', async () => {
+            const data = { title: 'T', isArchived: true };
+            noteRepository.create.mockResolvedValue({ id: 1, ...data });
+            await noteService.createNote(data);
+            expect(noteRepository.create).toHaveBeenCalled();
+        });
 
-            await expect(noteService.createNote(dummyInput))
-                .rejects.toThrow('Database Connection Lost');
+        it('3. Sukses buat catatan dengan status checklist', async () => {
+            const data = { title: 'T', isChecklist: true };
+            noteRepository.create.mockResolvedValue({ id: 1, ...data });
+            await noteService.createNote(data);
+            expect(noteRepository.create).toHaveBeenCalled();
+        });
+
+        it('4. Sukses buat catatan dengan reminder', async () => {
+            const data = { title: 'T', reminderDate: '2026-07-20' };
+            noteRepository.create.mockResolvedValue({ id: 1, ...data });
+            await noteService.createNote(data);
+            expect(noteRepository.create).toHaveBeenCalled();
+        });
+
+        it('5. Gagal buat catatan jika database error', async () => {
+            noteRepository.create.mockRejectedValue(new Error('DB Error'));
+            await expect(noteService.createNote({})).rejects.toThrow('DB Error');
         });
     });
 
     describe('Fungsi getAllNotes()', () => {
-        it('3. Harus mengembalikan array berisi daftar catatan jika data ada', async () => {
-            const dummyList = [
-                { id: 1, title: 'Nota A' },
-                { id: 2, title: 'Nota B' }
-            ];
-            noteRepository.readAll.mockResolvedValue(dummyList);
-
-            const result = await noteService.getAllNotes();
-
-            expect(Array.isArray(result)).toBe(true);
-            expect(result.length).toBe(2);
+        it('6. Berhasil ambil daftar catatan', async () => {
+            noteRepository.readAll.mockResolvedValue([{id: 1}]);
+            const res = await noteService.getAllNotes();
+            expect(res.length).toBe(1);
         });
 
-        it('4. Harus mengembalikan array kosong [] jika database belum ada isinya', async () => {
+        it('7. Berhasil kembalikan array kosong', async () => {
             noteRepository.readAll.mockResolvedValue([]);
-
-            const result = await noteService.getAllNotes();
-
-            expect(result).toEqual([]);
+            const res = await noteService.getAllNotes();
+            expect(res).toEqual([]);
         });
 
-        it('5. Harus melempar eror jika query SELECT gagal dieksekusi', async () => {
-            noteRepository.readAll.mockRejectedValue(new Error('Query Error'));
-
-            await expect(noteService.getAllNotes()).rejects.toThrow('Query Error');
+        it('8. Error saat baca database', async () => {
+            noteRepository.readAll.mockRejectedValue(new Error('Read Error'));
+            await expect(noteService.getAllNotes()).rejects.toThrow('Read Error');
         });
     });
 
     describe('Fungsi updateNote()', () => {
-        it('6. Harus sukses mengubah data catatan berdasarkan ID yang valid', async () => {
-            const updatedFields = { title: 'Judul Baru', content: 'Konten Diubah' };
-            noteRepository.update.mockResolvedValue({ id: 1, ...updatedFields });
-            
-            const result = await noteService.updateNote(1, updatedFields);
-            
-            expect(result.title).toBe('Judul Baru');
-            expect(result.id).toBe(1);
+        it('9. Update Title (String)', async () => {
+            noteRepository.update.mockResolvedValue({ id: 1, title: 'New' });
+            await noteService.updateNote(1, { title: 'New' });
+            expect(noteRepository.update).toHaveBeenCalled();
         });
 
-        it('7. Harus melempar eror jika proses UPDATE di database gagal', async () => {
-            noteRepository.update.mockRejectedValue(new Error('Update Failed'));
-            
-            await expect(noteService.updateNote(1, { title: 'Test' }))
-                .rejects.toThrow('Update Failed');
+        it('10. Update Pin Status (Boolean)', async () => {
+            noteRepository.update.mockResolvedValue({ id: 1, isPinned: true });
+            await noteService.updateNote(1, { isPinned: true });
+            expect(noteRepository.update).toHaveBeenCalled();
+        });
+
+        it('11. Update Archive Status', async () => {
+            noteRepository.update.mockResolvedValue({ id: 1, isArchived: true });
+            await noteService.updateNote(1, { isArchived: true });
+            expect(noteRepository.update).toHaveBeenCalledWith(1, { isArchived: true });
+        });
+
+        it('12. Update Checklist Status', async () => {
+            noteRepository.update.mockResolvedValue({ id: 1, isChecklist: true });
+            await noteService.updateNote(1, { isChecklist: true });
+            expect(noteRepository.update).toHaveBeenCalledWith(1, { isChecklist: true });
+        });
+
+        it('13. Update Reminder', async () => {
+            noteRepository.update.mockResolvedValue({ id: 1, reminderDate: '2026-08-01' });
+            await noteService.updateNote(1, { reminderDate: '2026-08-01' });
+            expect(noteRepository.update).toHaveBeenCalledWith(1, { reminderDate: '2026-08-01' });
+        });
+
+        it('14. Update Trash Status', async () => {
+            noteRepository.update.mockResolvedValue({ id: 1, isTrashed: true });
+            await noteService.updateNote(1, { isTrashed: true });
+            expect(noteRepository.update).toHaveBeenCalledWith(1, { isTrashed: true });
+        });
+
+        it('15. Update Label', async () => {
+            noteRepository.update.mockResolvedValue({ id: 1, label: 'Penting' });
+            await noteService.updateNote(1, { label: 'Penting' });
+            expect(noteRepository.update).toHaveBeenCalledWith(1, { label: 'Penting' });
+        });
+
+        it('16. Gagal update saat database error', async () => {
+            noteRepository.update.mockRejectedValue(new Error('Update Error'));
+            await expect(noteService.updateNote(1, {title: 'Fail'})).rejects.toThrow('Update Error');
         });
     });
 
     describe('Fungsi deleteNote()', () => {
-        it('8. Harus sukses menghapus catatan dan mengembalikan ID yang dihapus', async () => {
-            noteRepository.delete.mockResolvedValue({ id: 5 });
-
-            const result = await noteService.deleteNote(5);
-
-            expect(result).toHaveProperty('id');
-            expect(result.id).toBe(5);
-            expect(noteRepository.delete).toHaveBeenCalledWith(5);
+        it('17. Berhasil hapus catatan', async () => {
+            noteRepository.delete.mockResolvedValue({ id: 1 });
+            const res = await noteService.deleteNote(1);
+            expect(res.id).toBe(1);
         });
 
-        it('9. Harus melempar eror jika proses DELETE di database gagal', async () => {
-            noteRepository.delete.mockRejectedValue(new Error('Delete Failed'));
-
-            await expect(noteService.deleteNote(5))
-                .rejects.toThrow('Delete Failed');
+        it('18. Error saat hapus', async () => {
+            noteRepository.delete.mockRejectedValue(new Error('Delete Error'));
+            await expect(noteService.deleteNote(1)).rejects.toThrow('Delete Error');
         });
     });
 
-    describe('Fungsi PENCARIAN Catatan', () => {
-        it('10. Harus sukses menemukan catatan yang sesuai dengan kata kunci pencarian', async () => {
-            const mockSearchResult = [{ id: 10, title: 'Koding Kuliah', content: 'Bahas JavaScript' }];
-            
-            const searchMethod = noteRepository.searchNotes || noteRepository.getNoteByTitle;
-            searchMethod.mockResolvedValue(mockSearchResult);
-
-            const serviceMethod = noteService.searchNotes || noteService.getNotesByTitle || noteService.getAllNotes;
-            const result = await serviceMethod('Koding');
-
-            expect(Array.isArray(result)).toBe(true);
-            expect(result[0].title).toContain('Koding');
+    describe('Fungsi searchNotes()', () => {
+        it('19. Berhasil cari dengan keyword', async () => {
+            noteRepository.searchNotes.mockResolvedValue([{title: 'A'}]);
+            const res = await noteService.searchNotes('A');
+            expect(res[0].title).toBe('A');
         });
 
-        it('11. Harus mengembalikan array kosong [] jika tidak ada catatan yang cocok', async () => {
-            const searchMethod = noteRepository.searchNotes || noteRepository.getNoteByTitle;
-            searchMethod.mockResolvedValue([]);
-
-            const serviceMethod = noteService.searchNotes || noteService.getNotesByTitle || noteService.getAllNotes;
-            const result = await serviceMethod('KeywordNgawur');
-
-            expect(result).toEqual([]);
+        it('20. Berhasil cari keyword tidak ditemukan', async () => {
+            noteRepository.searchNotes.mockResolvedValue([]);
+            const res = await noteService.searchNotes('XYZ');
+            expect(res).toEqual([]);
         });
 
-        it('12. Harus melempar eror jika proses query pencarian database bermasalah', async () => {
-            const searchMethod = noteRepository.searchNotes || noteRepository.getNoteByTitle;
-            searchMethod.mockRejectedValue(new Error('Search Query Error'));
+        it('21. Error saat cari', async () => {
+            noteRepository.searchNotes.mockRejectedValue(new Error('Search Error'));
+            await expect(noteService.searchNotes('A')).rejects.toThrow('Search Error');
+        });
+    });
 
-            const serviceMethod = noteService.searchNotes || noteService.getNotesByTitle || noteService.getAllNotes;
-            await expect(serviceMethod('ErrorTest')).rejects.toThrow('Search Query Error');
+    describe('Eksplorasi Skenario Gabungan', () => {
+        it('22. Update banyak field sekaligus (Pin & Archive)', async () => {
+            noteRepository.update.mockResolvedValue({ id: 1, isPinned: true, isArchived: true });
+            await noteService.updateNote(1, { isPinned: true, isArchived: true });
+            expect(noteRepository.update).toHaveBeenCalledWith(1, { isPinned: true, isArchived: true });
+        });
+        
+        it('23. Update dengan Color', async () => {
+            noteRepository.update.mockResolvedValue({ id: 1, color: '#ff0000' });
+            await noteService.updateNote(1, { color: '#ff0000' });
+            expect(noteRepository.update).toHaveBeenCalledWith(1, { color: '#ff0000' });
         });
     });
 });

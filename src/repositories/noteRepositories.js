@@ -10,7 +10,6 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-// 1. Mengambil semua catatan dari MySQL
 const readAll = async () => {
     const [rows] = await pool.query('SELECT * FROM notes');
 
@@ -23,7 +22,6 @@ const readAll = async () => {
     }));
 };
 
-// 2. Menambah catatan baru dengan auto-fallback ID jika frontend tidak mengirimkannya
 const create = async (note) => {
     const finalId = note.id || Date.now(); 
     const { title, content, color, isPinned, isChecklist, label, isArchived, reminderDate, isTrashed } = note;
@@ -39,7 +37,6 @@ const create = async (note) => {
     return { ...note, id: finalId };
 };
 
-// 3. Mengubah catatan berdasarkan data yang dikirim frontend
 const update = async (id, updatedFields) => {
     const fields = [];
     const values = [];
@@ -60,13 +57,11 @@ const update = async (id, updatedFields) => {
     return { id, ...updatedFields };
 };
 
-// 4. Menghapus catatan berdasarkan ID
 const deleteNote = async (id) => {
     await pool.query('DELETE FROM notes WHERE id = ?', [id]);
     return { id };
 };
 
-// 5. Fungsi Pencarian Catatan
 const searchNotes = async (keyword) => {
     const [rows] = await pool.query(
         'SELECT * FROM notes WHERE (title LIKE ? OR content LIKE ?) AND isTrashed = 0',
@@ -81,7 +76,6 @@ const searchNotes = async (keyword) => {
     }));
 };
 
-// 6. Fungsi writeAll (cadangan)
 const writeAll = async (notes) => {
     await pool.query('TRUNCATE TABLE notes');
     if (notes.length === 0) return;
