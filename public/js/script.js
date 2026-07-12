@@ -137,7 +137,6 @@ function openCustomLabelModal(currentValue, callback) {
     });
 }
 
-// 3. LOGIKA NAVIGASI SIDEBAR (KIRI)
 const sidebarItems = document.querySelectorAll('aside ul li');
 sidebarItems.forEach(item => {
     item.addEventListener('click', () => {
@@ -213,9 +212,6 @@ formReminderBtn.addEventListener('click', () => {
     }
 });
 
-formImageBtn.addEventListener('click', () => {
-    alert('Fitur tambah gambar akan diintegrasikan dengan backend nanti!');
-});
 
 function resetFormState() {
     titleInput.value = '';
@@ -553,17 +549,15 @@ setInterval(() => {
     });
 }, 60000);
 
-// TRIGGER UTAMA SAAT HALAMAN DIBUKA PERTAMA KALI
 document.addEventListener('DOMContentLoaded', () => {
     loadNotes();
 });
 
-// 3. FITUR SEARCH BARU: Menyuplai nilai keyword ke sistem filter utama
 const searchInput = document.getElementById('searchInput');
 
 if (searchInput) {
     searchInput.addEventListener('input', (e) => {
         searchKeyword = e.target.value.toLowerCase().trim(); 
-        renderNotes(); // Menggambar ulang catatan secara rapi berdasarkan keyword saat ini
+        renderNotes(); 
     });
 }
