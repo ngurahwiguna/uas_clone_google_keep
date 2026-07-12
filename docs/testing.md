@@ -39,9 +39,29 @@ Ran all test suites.
 
 ## Daftar Skenario Pengujian
 
-Pengujian dibagi menjadi 3 lapisan (Layer) sesuai dengan arsitektur aplikasi untuk memastikan setiap bagian tanggung jawab teruji dengan benar:
-noteControllers.test.jsControllerValidasi input user, struktur response, dan integrasi dengan Service.
-noteService.test.jsServiceLogika bisnis inti, pengolahan data, dan error handling (Skenario sukses & gagal).noteRepositories.test.jsRepositoryInteraksi database (Query) dengan melakukan mocking pada modul MySQL.
+ 1. Note Controller (`controllers/noteController.js`)
+Tanggung jawab: Menangani request HTTP, validasi input, dan response.
+- Skenario:
+  - Mengambil seluruh note (`readAll`)
+  - Membuat note baru (`create`)
+  - Update data note (`update`)
+  - Menghapus note (`delete`)
+  - Pencarian note (`search`)
+
+2. Note Service (`services/noteService.js`)
+Tanggung jawab: Logika bisnis dan pemrosesan data sebelum ke database.
+- Skenario:
+  - Validasi data lengkap & error handling database.
+  - Pengolahan boolean (`isPinned`, `isArchived`, dll).
+  - Penanganan kondisi array kosong.
+  - Skenario database *reject* (memastikan sistem tidak *crash*).
+
+ 3. Note Repository (`repositories/noteRepositories.js`)
+Tanggung jawab: Eksekusi query langsung ke database (dengan Mocking).
+- Skenario:
+  - Eksekusi query `SELECT`, `INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`.
+  - Simulasi hasil database (Mocking).
+  - Penanganan *edge case* (seperti `TRUNCATE` pada array kosong).
 
 ## Cara Menjalankan Testing
 
