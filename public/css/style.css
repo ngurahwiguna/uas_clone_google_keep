@@ -10,7 +10,6 @@ body {
     color: #202124;
 }
 
-/* ================= HEADER ================= */
 header {
     height: 70px;
     background: white;
@@ -76,13 +75,11 @@ header {
     cursor: pointer;
 }
 
-/* ================= CONTAINER ================= */
 .container {
     display: flex;
     margin-top: 70px;
 }
 
-/* ================= SIDEBAR ================= */
 aside {
     width: 240px;
     background: white;
@@ -119,14 +116,12 @@ aside li:hover {
     font-weight: 500;
 }
 
-/* ================= MAIN ================= */
 main {
     width: calc(100% - 240px);
     margin-left: 240px;
     padding: 35px;
 }
 
-/* ================= FORM TAMBAH ================= */
 .add-note {
     width: 650px;
     max-width: 100%;
@@ -221,7 +216,6 @@ main {
     transform: scale(1.05);
 }
 
-/* ================= CARDS (NOTES GRID) ================= */
 .notes {
     width: 100%;
     margin-top: 30px;
@@ -315,11 +309,10 @@ main {
     color: #3c4043;
 }
 
-/* ================= DROPDOWN MENU CARD ================= */
 .card-menu {
     display: none;
     position: absolute;
-    top: 85%; /* Menyesuaikan posisi di dekat tombol tiga titik */
+    top: 85%; 
     right: 15px;
     width: 160px;
     background: white;
@@ -349,7 +342,6 @@ main {
     display: block;
 }
 
-/* ================= MODALS ================= */
 .modal {
     display: none;
     position: fixed;
@@ -422,7 +414,7 @@ main {
 }
 
 #confirmDelete {
-    background: #d93025; /* Warna merah untuk aksi hapus */
+    background: #d93025; 
     color: white;
 }
 

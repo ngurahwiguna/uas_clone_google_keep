@@ -16,7 +16,6 @@
 
 <body>
 
-<!-- ================= HEADER ================= -->
 <header>
     <div class="left-header">
         <span class="material-icons menu-btn">menu</span>
@@ -39,10 +38,8 @@
     </div>
 </header>
 
-<!-- ================= CONTAINER ================= -->
 <div class="container">
 
-    <!-- ================= SIDEBAR ================= -->
     <aside>
         <ul>
             <li class="active">
@@ -68,9 +65,8 @@
         </ul>
     </aside>
 
-    <!-- ================= MAIN ================= -->
     <main>
-        <!-- Form Tambah -->
+    
         <section class="add-note">
             <input type="text" id="title" placeholder="Judul">
             <textarea id="content" placeholder="Tulis catatan..."></textarea>
@@ -114,13 +110,11 @@
             </div>
         </section>
 
-        <!-- Notes Container -->
         <section class="notes" id="notes"></section>
     </main>
 
 </div>
 
-<!-- ================= TEMPLATE CARD ================= -->
 <template id="noteTemplate">
     <div class="card">
         <div class="pin-area">
@@ -154,7 +148,6 @@
     </div>
 </template>
 
-<!-- ================= MODAL EDIT & DELETE (DI LUAR TEMPLATE) ================= -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h2>Edit Catatan</h2>
@@ -178,7 +171,6 @@
     </div>
 </div>
 
-<!-- JavaScript Load -->
 <script src="js/script.js"></script>
 
 </body>

@@ -1,17 +1,14 @@
-// 1. STATE DATA UTAMA
 let notes = [];
 let currentView = 'notes'; 
 let currentEditId = null;
 let currentDeleteId = null;
 
-// STATE SEMENTARA UNTUK FORM TAMBAH CATATAN
 let formIsPinned = false;
 let formIsChecklist = false;
 let formLabel = '';
 let formIsArchived = false;
-let formReminderDate = ''; // Menyimpan tanggal (Format: YYYY-MM-DD)
+let formReminderDate = ''; 
 
-// 2. ELEMEN DOM DARI HTML
 const titleInput = document.getElementById('title');
 const contentInput = document.getElementById('content');
 const colorSelect = document.getElementById('color');
@@ -19,7 +16,6 @@ const addBtn = document.getElementById('addBtn');
 const notesContainer = document.getElementById('notes');
 const noteTemplate = document.getElementById('noteTemplate');
 
-// Elemen Tombol di Form Tambah Catatan
 const formPinBtn = document.getElementById('pinBtn');
 const formChecklistBtn = document.getElementById('checklistBtn');
 const formLabelBtn = document.getElementById('labelBtn');
@@ -27,23 +23,29 @@ const formArchiveBtn = document.getElementById('archiveBtn');
 const formReminderBtn = document.getElementById('reminderBtn');
 const formImageBtn = document.getElementById('imageBtn');
 
-// Elemen Modals
 const editModal = document.getElementById('editModal');
 const deleteModal = document.getElementById('deleteModal');
 const editTitleInput = document.getElementById('editTitle');
 const editContentInput = document.getElementById('editContent');
 
-// Tombol Modals
 const cancelEditBtn = document.getElementById('cancelEdit');
 const saveEditBtn = document.getElementById('saveEdit');
 const cancelDeleteBtn = document.getElementById('cancelDelete');
 const confirmDeleteBtn = document.getElementById('confirmDelete');
 
-// ==========================================
-// FUNGSIONALITAS BARU: MODAL LABEL KUSTOM (ANTI POP-UP ATAS)
-// ==========================================
+async function loadNotes() {
+    try {
+        const response = await fetch('/api/notes');
+        if (response.ok) {
+            notes = await response.json();
+            renderNotes();
+        }
+    } catch (error) {
+        console.error('🔴 Gagal memuat data dari database:', error);
+    }
+}
+
 function openCustomLabelModal(currentValue, callback) {
-    // Membuat overlay latar belakang gelap transparan
     const overlay = document.createElement('div');
     overlay.style.position = 'fixed';
     overlay.style.top = '0';
@@ -56,7 +58,6 @@ function openCustomLabelModal(currentValue, callback) {
     overlay.style.alignItems = 'center';
     overlay.style.zIndex = '9999';
 
-    // Membuat kotak modal utama
     const modalBox = document.createElement('div');
     modalBox.style.backgroundColor = '#fff';
     modalBox.style.padding = '20px';
@@ -65,7 +66,6 @@ function openCustomLabelModal(currentValue, callback) {
     modalBox.style.boxShadow = '0 4px 14px rgba(0,0,0,0.15)';
     modalBox.style.fontFamily = 'inherit';
 
-    // Judul Modal
     const title = document.createElement('h3');
     title.textContent = 'Label Catatan';
     title.style.marginTop = '0';
@@ -73,7 +73,6 @@ function openCustomLabelModal(currentValue, callback) {
     title.style.fontSize = '16px';
     title.style.color = '#3c4043';
 
-    // Input Teks Label
     const input = document.createElement('input');
     input.type = 'text';
     input.value = currentValue || '';
@@ -87,13 +86,11 @@ function openCustomLabelModal(currentValue, callback) {
     input.style.outline = 'none';
     input.style.fontSize = '14px';
 
-    // Wadah Tombol Aksi
     const btnContainer = document.createElement('div');
     btnContainer.style.display = 'flex';
     btnContainer.style.justifyContent = 'flex-end';
     btnContainer.style.gap = '8px';
 
-    // Tombol Batal
     const cancelBtn = document.createElement('button');
     cancelBtn.textContent = 'Batal';
     cancelBtn.style.padding = '8px 12px';
@@ -103,7 +100,6 @@ function openCustomLabelModal(currentValue, callback) {
     cancelBtn.style.color = '#5f6368';
     cancelBtn.style.fontWeight = '500';
 
-    // Tombol Simpan
     const saveBtn = document.createElement('button');
     saveBtn.textContent = 'Simpan';
     saveBtn.style.padding = '8px 16px';
@@ -114,7 +110,6 @@ function openCustomLabelModal(currentValue, callback) {
     saveBtn.style.cursor = 'pointer';
     saveBtn.style.fontWeight = '500';
 
-    // Masukkan elemen ke dalam DOM
     btnContainer.appendChild(cancelBtn);
     btnContainer.appendChild(saveBtn);
     modalBox.appendChild(title);
@@ -123,17 +118,14 @@ function openCustomLabelModal(currentValue, callback) {
     overlay.appendChild(modalBox);
     document.body.appendChild(overlay);
 
-    // Otomatis fokus ke input text
     input.focus();
 
-    // Event handler klik tombol
     cancelBtn.addEventListener('click', () => overlay.remove());
     saveBtn.addEventListener('click', () => {
         callback(input.value.trim());
         overlay.remove();
     });
 
-    // Event handler tombol Enter / Escape keyboard
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             callback(input.value.trim());
@@ -169,7 +161,6 @@ sidebarItems.forEach(item => {
     });
 });
 
-// 4. LOGIKA TOMBOL-TOMBOL DI FORM TAMBAH CATATAN
 formPinBtn.addEventListener('click', () => {
     formIsPinned = !formIsPinned;
     formPinBtn.style.color = formIsPinned ? '#fbbc04' : '#5f6368';
@@ -181,7 +172,6 @@ formChecklistBtn.addEventListener('click', () => {
     contentInput.placeholder = formIsChecklist ? 'Tulis list (gunakan Enter untuk baris baru)...' : 'Tulis catatan...';
 });
 
-// FIX LABEL FORM: Memanggil modal kustom, bukan prompt atas browser lagi
 formLabelBtn.addEventListener('click', () => {
     openCustomLabelModal(formLabel, (result) => {
         formLabel = result;
@@ -194,11 +184,9 @@ formArchiveBtn.addEventListener('click', () => {
     formArchiveBtn.style.color = formIsArchived ? '#fbbc04' : '#5f6368';
 });
 
-// LOGIKA PENGINGAT
 formReminderBtn.addEventListener('click', () => {
     const dateInput = document.createElement('input');
     dateInput.type = 'date';
-    
     dateInput.style.position = 'absolute';
     dateInput.style.opacity = '0';
     dateInput.style.top = '0';
@@ -208,11 +196,7 @@ formReminderBtn.addEventListener('click', () => {
     
     dateInput.addEventListener('change', (e) => {
         formReminderDate = e.target.value;
-        if (formReminderDate) {
-            formReminderBtn.style.color = '#fbbc04'; 
-        } else {
-            formReminderBtn.style.color = '#5f6368';
-        }
+        formReminderBtn.style.color = formReminderDate ? '#fbbc04' : '#5f6368';
         dateInput.remove(); 
     });
 
@@ -232,7 +216,6 @@ formImageBtn.addEventListener('click', () => {
     alert('Fitur tambah gambar akan diintegrasikan dengan backend nanti!');
 });
 
-// FUNGSI RESET FORM SETELAH BERHASIL SUBMIT
 function resetFormState() {
     titleInput.value = '';
     contentInput.value = '';
@@ -250,7 +233,6 @@ function resetFormState() {
     });
 }
 
-// 5. FUNGSI UNTUK MENAMPILKAN CATATAN
 function renderNotes() {
     notesContainer.innerHTML = ''; 
 
@@ -319,16 +301,19 @@ function renderNotes() {
         }
 
         const pinBtn = card.querySelector('.pin-btn');
-        if (note.isPinned) {
-            pinBtn.querySelector('span').style.color = '#fbbc04'; 
-        } else {
-            pinBtn.querySelector('span').style.color = '#5f6368';
-        }
+        pinBtn.querySelector('span').style.color = note.isPinned ? '#fbbc04' : '#5f6368';
 
-        pinBtn.addEventListener('click', (e) => {
+        // PIN API
+        pinBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
-            note.isPinned = !note.isPinned;
-            renderNotes();
+            try {
+                await fetch(`/api/notes/${note.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ isPinned: !note.isPinned })
+                });
+                loadNotes();
+            } catch (err) { console.error(err); }
         });
 
         const menuBtn = card.querySelector('.menu-btn');
@@ -363,10 +348,16 @@ function renderNotes() {
             deleteBtn.textContent = 'Hapus';
         }
 
-        editBtn.addEventListener('click', () => {
+        editBtn.addEventListener('click', async () => {
             if (note.isTrashed) {
-                note.isTrashed = false;
-                renderNotes();
+                try {
+                    await fetch(`/api/notes/${note.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ isTrashed: false })
+                    });
+                    loadNotes();
+                } catch (err) { console.error(err); }
             } else {
                 currentEditId = note.id;
                 editTitleInput.value = note.title;
@@ -375,25 +366,42 @@ function renderNotes() {
             }
         });
 
-        archiveBtn.textContent = note.isArchived ? 'Pindahkan ke Catatan' : 'Arsirkan';
-        archiveBtn.addEventListener('click', () => {
-            note.isArchived = !note.isArchived;
-            renderNotes();
+        archiveBtn.textContent = note.isArchived ? 'Pindahkan ke Catatan' : 'Arsipkan';
+        archiveBtn.addEventListener('click', async () => {
+            try {
+                await fetch(`/api/notes/${note.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ isArchived: !note.isArchived })
+                });
+                loadNotes();
+            } catch (err) { console.error(err); }
         });
 
-        // FIX LABEL KARTU: Memanggil modal kustom yang sama biar ga ada dialog atas browser
         labelBtn.textContent = note.label ? 'Ubah Label' : 'Tambah Label';
         labelBtn.addEventListener('click', () => {
-            openCustomLabelModal(note.label, (result) => {
-                note.label = result;
-                renderNotes();
+            openCustomLabelModal(note.label, async (result) => {
+                try {
+                    await fetch(`/api/notes/${note.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ label: result })
+                    });
+                    loadNotes();
+                } catch (err) { console.error(err); }
             });
         });
 
         checklistBtn.textContent = note.isChecklist ? 'Ubah ke Teks Biasa' : 'Ubah ke Checklist';
-        checklistBtn.addEventListener('click', () => {
-            note.isChecklist = !note.isChecklist;
-            renderNotes();
+        checklistBtn.addEventListener('click', async () => {
+            try {
+                await fetch(`/api/notes/${note.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ isChecklist: !note.isChecklist })
+                });
+                loadNotes();
+            } catch (err) { console.error(err); }
         });
 
         deleteBtn.addEventListener('click', () => {
@@ -401,21 +409,34 @@ function renderNotes() {
             deleteModal.classList.add('show');
         });
 
-        card.querySelector('.duplicate-btn').addEventListener('click', () => {
-            notes.push({
-                ...note,
-                id: Date.now(),
-                title: note.title + ' (Salinan)'
-            });
-            renderNotes();
+        card.querySelector('.duplicate-btn').addEventListener('click', async () => {
+            const duplicatedNote = {
+                title: note.title + ' (Salinan)',
+                content: note.content,
+                color: note.color,
+                isPinned: note.isPinned,
+                isChecklist: note.isChecklist,
+                label: note.label,
+                isArchived: note.isArchived,
+                reminderDate: note.reminderDate
+            };
+            try {
+                await fetch('/api/notes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(duplicatedNote)
+                });
+                loadNotes();
+            } catch (err) { console.error(err); }
         });
 
         notesContainer.appendChild(clone);
     });
 }
 
-// 6. EVENT LISTENERS TOMBOL TAMBAH UTAMA
-addBtn.addEventListener('click', () => {
+addBtn.addEventListener('click', async (e) => {
+    if (e) e.preventDefault(); 
+
     const title = titleInput.value.trim();
     const content = contentInput.value.trim();
     const color = colorSelect.value;
@@ -426,7 +447,6 @@ addBtn.addEventListener('click', () => {
     }
 
     const newNote = {
-        id: Date.now(),
         title: title,
         content: content,
         color: color,
@@ -434,13 +454,23 @@ addBtn.addEventListener('click', () => {
         isChecklist: formIsChecklist,
         label: formLabel,
         isArchived: formIsArchived,
-        reminderDate: formReminderDate, 
-        isTrashed: false
+        reminderDate: formReminderDate
     };
 
-    notes.push(newNote);
-    resetFormState();
-    renderNotes();
+    try {
+        const response = await fetch('/api/notes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newNote)
+        });
+
+        if (response.ok) {
+            resetFormState();
+            loadNotes();
+        }
+    } catch (error) {
+        console.error('Gagal mengirim data POST ke server:', error);
+    }
 });
 
 document.addEventListener('click', () => {
@@ -448,34 +478,53 @@ document.addEventListener('click', () => {
 });
 
 cancelEditBtn.addEventListener('click', () => editModal.classList.remove('show'));
-saveEditBtn.addEventListener('click', () => {
-    const note = notes.find(n => n.id === currentEditId);
-    if (note) {
-        note.title = editTitleInput.value.trim();
-        note.content = editContentInput.value.trim();
-        editModal.classList.remove('show');
-        renderNotes();
+
+saveEditBtn.addEventListener('click', async () => {
+    try {
+        const response = await fetch(`/api/notes/${currentEditId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: editTitleInput.value.trim(),
+                content: editContentInput.value.trim()
+            })
+        });
+
+        if (response.ok) {
+            editModal.classList.remove('show');
+            loadNotes();
+        }
+    } catch (error) {
+        console.error(' Gagal mengubah konten catatan:', error);
     }
 });
 
 cancelDeleteBtn.addEventListener('click', () => deleteModal.classList.remove('show'));
-confirmDeleteBtn.addEventListener('click', () => {
+
+confirmDeleteBtn.addEventListener('click', async () => {
     const note = notes.find(n => n.id === currentDeleteId);
     
     if (note) {
-        if (note.isTrashed) {
-            notes = notes.filter(n => n.id !== currentDeleteId);
-        } else {
-            note.isTrashed = true;
-            note.isPinned = false;
+        try {
+            if (note.isTrashed) {
+        
+                await fetch(`/api/notes/${currentDeleteId}`, { method: 'DELETE' });
+            } else {
+             
+                await fetch(`/api/notes/${currentDeleteId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ isTrashed: true, isPinned: false })
+                });
+            }
+            deleteModal.classList.remove('show');
+            loadNotes();
+        } catch (error) {
+            console.error(' Gagal menghapus catatan:', error);
         }
     }
-    
-    deleteModal.classList.remove('show');
-    renderNotes();
 });
 
-// --- PENGECEK ALARM HARIAN OTOMATIS (MENGGUNAKAN MODAL BUKAN ALERT BAWAAN) ---
 setInterval(() => {
     const sekarang = new Date();
     const tahun = sekarang.getFullYear();
@@ -485,11 +534,19 @@ setInterval(() => {
 
     notes.forEach(note => {
         if (note.reminderDate === hariIniString && !note.isTrashed) {
-            // Kita biarkan alarm hariannya pakai modal kustom bawaan jika ingin diganti nanti,
-            // saat ini agar sistem tetap memicu pemberitahuan kita pertahankan alert/custom dialog.
-            alert(`📅 PENGINGAT HARI INI:\n\nCatatan: "${note.title || 'Tanpa Judul'}"\nIsi: ${note.content}`);
+            alert(` PENGINGAT HARI INI:\n\nCatatan: "${note.title || 'Tanpa Judul'}"\nIsi: ${note.content}`);
             note.reminderDate = ''; 
-            renderNotes(); 
+            // Update status ke server agar alarm tidak terpicu lagi
+            fetch(`/api/notes/${note.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reminderDate: '' })
+            }).then(() => loadNotes());
         }
     });
 }, 60000);
+
+// TRIGGER UTAMA SAAT HALAMAN DIBUKA PERTAMA KALI
+document.addEventListener('DOMContentLoaded', () => {
+    loadNotes();
+});
