@@ -550,3 +550,24 @@ setInterval(() => {
 document.addEventListener('DOMContentLoaded', () => {
     loadNotes();
 });
+
+const searchInput = document.getElementById('searchInput');
+
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        const keyword = e.target.value.toLowerCase().trim(); 
+        const noteCards = document.querySelectorAll('#notes .card'); 
+
+        noteCards.forEach(card => {
+            // Ambil teks judul dan isi dari dalam masing-masing kartu
+            const title = card.querySelector('.note-title')?.textContent.toLowerCase() || '';
+            const content = card.querySelector('.note-content')?.textContent.toLowerCase() || '';
+
+            if (title.includes(keyword) || content.includes(keyword)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none'; 
+            }
+        });
+    });
+}

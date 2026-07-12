@@ -1,36 +1,26 @@
-const noteRepository = require('../repositories/noteRepositories'); 
-const Note = require('../models/note'); 
+const noteRepository = require('../repositories/noteRepositories');
 
-const getAllNotes = async () => {
-    return await noteRepository.readAll();
+const noteService = {
+    // 1. Mengambil semua catatan dari MySQL
+    getAllNotes: async () => {
+        return await noteRepository.readAll();
+    },
+
+    // 2. Menambah catatan baru langsung ke MySQL
+    createNote: async (noteData) => {
+        // Kita langsung lempar payload data dari frontend ke repositori database
+        return await noteRepository.create(noteData);
+    },
+
+    // 3. Mengubah catatan berdasarkan ID di MySQL
+    updateNote: async (id, updatedFields) => {
+        return await noteRepository.update(id, updatedFields);
+    },
+
+    // 4. Menghapus catatan berdasarkan ID di MySQL
+    deleteNote: async (id) => {
+        return await noteRepository.delete(id);
+    }
 };
 
-const createNote = async (noteData) => {
-    const notes = await noteRepository.readAll();
-    const newNote = new Note(noteData);
-    notes.push(newNote);
-    await noteRepository.writeAll(notes);
-    return newNote;
-};
-
-const updateNote = async (id, updatedFields) => {
-    const notes = await noteRepository.readAll();
-    const index = notes.findIndex(n => n.id === id);
-    if (index === -1) return null;
-
-    notes[index] = { ...notes[index], ...updatedFields };
-    await noteRepository.writeAll(notes);
-    return notes[index];
-};
-
-const deleteNote = async (id) => {
-    let notes = await noteRepository.readAll();
-    const exists = notes.some(n => n.id === id);
-    if (!exists) return false;
-
-    notes = notes.filter(n => n.id !== id);
-    await noteRepository.writeAll(notes);
-    return true;
-};
-
-module.exports = { getAllNotes, createNote, updateNote, deleteNote };
+module.exports = noteService;
